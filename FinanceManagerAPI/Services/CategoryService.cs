@@ -64,7 +64,7 @@ namespace FinanceManagerAPI.Services
             return new CategoryDto { Id = category.Id, Name = category.Name, Type = category.Type};
         }
 
-        public async Task Update(OperationDto expectedEntityValues)
+        public async Task Update(CategoryDto expectedEntityValues)
         {
             var existingCategory = await _context.Categories.FindAsync(expectedEntityValues.Id);
 

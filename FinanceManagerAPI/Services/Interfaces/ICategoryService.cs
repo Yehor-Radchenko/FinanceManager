@@ -9,7 +9,7 @@ namespace FinanceManagerAPI.Services.Interfaces
         public Task<IEnumerable<CategoryDto>?> GetAll();
         public Task<CategoryDto?> GetById(int id);
         public Task Create(CategoryDto model);
-        public Task Update(OperationDto expectedEntityValues);
+        public Task Update(CategoryDto expectedEntityValues);
         public Task Delete(int? id);
     }
 }

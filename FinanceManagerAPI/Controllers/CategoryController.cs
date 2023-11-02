@@ -23,7 +23,7 @@ namespace FinanceManagerAPI.Controllers
             return Ok(await _categoryService.GetAll());
         }
 
-        [HttpGet("{categoryId}")]
+        [HttpGet("{Id}")]
         [ProducesResponseType(200, Type = typeof(OperationCategory))]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetCategory(int categoryId)
@@ -36,10 +36,24 @@ namespace FinanceManagerAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostCategory([FromBody]CategoryDto category)
+        public async Task<IActionResult> PostCategory([FromBody] CategoryDto category)
         {
             await _categoryService.Create(category);
             return Ok("Successfully created");
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> PutCategory(CategoryDto category)
+        {
+            await _categoryService.Update(category);
+            return Ok("Updated successfully.");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            await _categoryService.Delete(id);
+            return Ok("Deleted successfully.");
         }
     }
 }
