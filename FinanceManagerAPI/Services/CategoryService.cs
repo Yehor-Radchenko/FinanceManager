@@ -15,7 +15,7 @@ namespace FinanceManagerAPI.Services
 
         public async Task Create(OperationCategory model)
         {
-            if (_context.Categories.FirstOrDefault(c => c.Name == model.Name) is not null)
+            if (_context.Categories.Where(c => c.Name.Trim().ToUpper() == model.Name.TrimEnd().ToUpper()).FirstOrDefault() is not null)
             {
                 throw new Exception("Category with this name is already exists.");
             }

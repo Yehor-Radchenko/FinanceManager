@@ -7,6 +7,6 @@ namespace FinanceManagerAPI.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public OperationType Type { get; set; }
-        public List<FinancialOperation> FinancialOperations { get; set; }
+        public List<FinancialOperation>? FinancialOperations { get; set; }
     }
 }
