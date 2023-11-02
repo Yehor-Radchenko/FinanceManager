@@ -1,4 +1,5 @@
-﻿using FinanceManagerAPI.Models;
+﻿using FinanceManagerAPI.Data;
+using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ namespace FinanceManagerAPI.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<OperationCategory>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDto>))]
         public async Task<IActionResult> GetCategories()
         {
             return Ok(await _categoryService.GetAll());
@@ -35,7 +36,7 @@ namespace FinanceManagerAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostCategory([FromBody]OperationCategory category)
+        public async Task<IActionResult> PostCategory([FromBody]CategoryDto category)
         {
             await _categoryService.Create(category);
             return Ok("Successfully created");
