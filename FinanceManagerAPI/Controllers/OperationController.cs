@@ -62,5 +62,12 @@ namespace FinanceManagerAPI.Controllers
             var report = await _operationService.GetOperationsForPeriod(date);
             return Ok(report);
         }
+
+        [HttpGet("period-report")]
+        public async Task<IActionResult> GetPeriodReport(string startDate, string endDate)
+        {
+            var report = await _operationService.GetOperationsForPeriod(startDate, endDate);
+            return Ok(report);
+        }
     }
 }

@@ -143,14 +143,17 @@ namespace FinanceManagerAPI.Services
 
         public async Task<ReportDto> GetOperationsForPeriod(string startDate, string endDate)
         {
-            if (DateTime.TryParseExact(startDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedStartDate)
-                & DateTime.TryParseExact(endDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedEndDate))
+            if (!(DateTime.TryParseExact(startDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedStartDate)
+                && DateTime.TryParseExact(endDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedEndDate)))
             {
                 throw new Exception("Invalid date format. Use format: dd.MM.yyyy");
             }
 
+            var formattedStartDate = checkedStartDate.Date;
+            var formattedEndDate = checkedEndDate.Date;
+
             var periodOperations = await _context.Operations
-                .Where(o => o.DateTime.Date >= checkedStartDate && o.DateTime.Date <= checkedEndDate)
+                .Where(o => o.DateTime.Date >= formattedStartDate && o.DateTime.Date <= formattedEndDate)
                 .Include(o => o.Category)
                 .ToListAsync();
 
@@ -175,6 +178,7 @@ namespace FinanceManagerAPI.Services
                     CategoryId = operation.Category.Id
                 });
             }
+
             var report = new ReportDto
             {
                 TotalIncome = totalIncome,
@@ -184,5 +188,6 @@ namespace FinanceManagerAPI.Services
 
             return report;
         }
+
     }
 }
