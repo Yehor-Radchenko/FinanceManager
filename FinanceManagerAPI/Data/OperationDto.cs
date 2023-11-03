@@ -5,15 +5,21 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+
+        private decimal? _moneyAmount;
         public decimal? MoneyAmount
         {
-            get { return MoneyAmount; }
+            get { return _moneyAmount; }
             set
             {
-                if (value > 0)
-                    MoneyAmount = value;
+                if (value.HasValue && value.Value >= 0)
+                {
+                    _moneyAmount = value;
+                }
                 else
-                    throw new ArgumentException("MoneyAmount cant be less than zero.");
+                {
+                    throw new ArgumentException("MoneyAmount cannot be less than zero.");
+                }
             }
         }
         public DateTime DateTime { get; set; }

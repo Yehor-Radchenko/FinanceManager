@@ -1,7 +1,10 @@
 ﻿using FinanceManagerAPI.Data;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services.Interfaces;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace FinanceManagerAPI.Services
 {
@@ -42,10 +45,11 @@ namespace FinanceManagerAPI.Services
         public async Task<IEnumerable<OperationDto>> GetAll()
         {
             List<OperationDto> operations = new List<OperationDto>();
+            
             List<FinancialOperation> operationModels = await _context.Operations.ToListAsync();
             foreach (var i in operationModels)
             {
-                operations.Add(new OperationDto
+                var operationDto = new OperationDto
                 {
                     Id = i.Id,
                     Name = i.Name,
@@ -53,8 +57,11 @@ namespace FinanceManagerAPI.Services
                     MoneyAmount = i.MoneyAmount,
                     DateTime = i.DateTime,
                     CategoryId = i.CategoryId
-                });
+                };
+
+                operations.Add(operationDto);
             }
+
             return operations;
         }
 
@@ -88,6 +95,94 @@ namespace FinanceManagerAPI.Services
 
             _context.Entry(existingOperation).CurrentValues.SetValues(expectedEntityValues);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<ReportDto> GetOperationsForPeriod(string inputDate)
+        {
+            if (!DateTime.TryParseExact(inputDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedDate))
+            {
+                throw new Exception("Invalid date format. Use format: dd.MM.yyyy");
+            }
+
+            var formattedDate = checkedDate.Date;
+            var dayOperations = await _context.Operations
+                .Where(o => EF.Functions.DateDiffDay(o.DateTime, formattedDate) == 0)
+                .Include(o => o.Category)
+                .ToListAsync();
+
+            decimal? totalIncome = 0;
+            decimal? totalExpense = 0;
+            var dayOperationsDto = new List<OperationDto>();
+
+            foreach (var operation in dayOperations)
+            {
+                if (operation.Category.Type is OperationType.Income)
+                    totalIncome += operation.MoneyAmount;
+                if (operation.Category.Type is OperationType.Expense)
+                    totalExpense += operation.MoneyAmount;
+
+                dayOperationsDto.Add(new OperationDto
+                {
+                    Id = operation.Id,
+                    Name = operation.Name,
+                    Description = operation.Description,
+                    DateTime = operation.DateTime,
+                    MoneyAmount = operation.MoneyAmount,
+                    CategoryId = operation.Category.Id
+                });
+            }
+            var report = new ReportDto
+            {
+                TotalIncome = totalIncome,
+                TotalExpense = totalExpense,
+                operationsForPeriod = dayOperationsDto
+            };
+
+            return report;
+        }
+
+        public async Task<ReportDto> GetOperationsForPeriod(string startDate, string endDate)
+        {
+            if (DateTime.TryParseExact(startDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedStartDate)
+                & DateTime.TryParseExact(endDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedEndDate))
+            {
+                throw new Exception("Invalid date format. Use format: dd.MM.yyyy");
+            }
+
+            var periodOperations = await _context.Operations
+                .Where(o => o.DateTime.Date >= checkedStartDate && o.DateTime.Date <= checkedEndDate)
+                .Include(o => o.Category)
+                .ToListAsync();
+
+            decimal? totalIncome = 0;
+            decimal? totalExpense = 0;
+            var periodOperationsDto = new List<OperationDto>();
+
+            foreach (var operation in periodOperations)
+            {
+                if (operation.Category.Type is OperationType.Income)
+                    totalIncome += operation.MoneyAmount;
+                if (operation.Category.Type is OperationType.Expense)
+                    totalExpense += operation.MoneyAmount;
+
+                periodOperationsDto.Add(new OperationDto
+                {
+                    Id = operation.Id,
+                    Name = operation.Name,
+                    Description = operation.Description,
+                    DateTime = operation.DateTime,
+                    MoneyAmount = operation.MoneyAmount,
+                    CategoryId = operation.Category.Id
+                });
+            }
+            var report = new ReportDto
+            {
+                TotalIncome = totalIncome,
+                TotalExpense = totalExpense,
+                operationsForPeriod = periodOperationsDto
+            };
+
+            return report;
         }
     }
 }

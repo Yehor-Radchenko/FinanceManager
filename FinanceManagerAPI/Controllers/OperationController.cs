@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManagerAPI.Controllers
 {
-    [Route("api/Operation")]
+    [Route("api/[controller]")]
     [ApiController]
     public class OperationController : Controller
     {
@@ -54,6 +54,13 @@ namespace FinanceManagerAPI.Controllers
         {
             await _operationService.Delete(id);
             return Ok("Deleted successfully.");
+        }
+
+        [HttpGet("daily-report")]
+        public async Task<IActionResult> GetDailyReport(string date)
+        {
+            var report = await _operationService.GetOperationsForPeriod(date);
+            return Ok(report);
         }
     }
 }

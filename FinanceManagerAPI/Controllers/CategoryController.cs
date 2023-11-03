@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceManagerAPI.Controllers
 {
-    [Route("api/Category")]
+    [Route("api/[controller]")]
     [ApiController]
     public class CategoryController : Controller
     {
