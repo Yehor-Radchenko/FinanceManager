@@ -26,9 +26,9 @@ namespace FinanceManagerAPI.Controllers
         [HttpGet("{Id}")]
         [ProducesResponseType(200, Type = typeof(OperationCategory))]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> GetCategory(int categoryId)
+        public async Task<IActionResult> GetCategory(int Id)
         {
-            var category = await _categoryService.GetById(categoryId);
+            var category = await _categoryService.GetById(Id);
             if (category is null)
                 return NotFound();
 

@@ -32,6 +32,9 @@ namespace FinanceManagerAPI.Services
 
         public async Task Delete(int? id)
         {
+            if (!await _context.Categories.AnyAsync(c => c.Id == id))
+                throw new Exception($"Сategory with Id: {id} was not found");
+
             OperationCategory course = new OperationCategory { Id = id.Value };
             _context.Entry(course).State = EntityState.Deleted;
             await _context.SaveChangesAsync();
@@ -66,7 +69,7 @@ namespace FinanceManagerAPI.Services
 
         public async Task Update(CategoryDto expectedEntityValues)
         {
-            var existingCategory = await _context.Categories.FindAsync(expectedEntityValues.Id);
+            var existingCategory = await _context.Categories.FirstOrDefaultAsync(g => g.Id == expectedEntityValues.Id);
 
             if (existingCategory is null)
             {
@@ -86,6 +89,11 @@ namespace FinanceManagerAPI.Services
             _context.Entry(existingCategory).CurrentValues.SetValues(expectedEntityValues);
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> CategoryExists(int id)
+        {
+            return await _context.Categories.AnyAsync(c => c.Id == id);
         }
     }
 }

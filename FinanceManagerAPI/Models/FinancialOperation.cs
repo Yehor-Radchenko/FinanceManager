@@ -10,6 +10,6 @@ namespace FinanceManagerAPI.Models
         public decimal? MoneyAmount { get; set; }
         public DateTime DateTime { get; set; }
         public int CategoryId { get; set; }
-        public OperationCategory Category { get; set; }
+        public OperationCategory? Category { get; set; }
     }
 }
