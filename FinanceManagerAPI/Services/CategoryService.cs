@@ -2,6 +2,7 @@
 using FinanceManagerAPI.Data.Category;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services.Interfaces;
+using FinanceManagerAPI.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceManagerAPI.Services
@@ -53,11 +54,11 @@ namespace FinanceManagerAPI.Services
             }
         }
 
-        public async Task<IEnumerable<CategoryUpdateDto>?> GetAll()
+        public async Task<IEnumerable<CategoryViewModel>?> GetAll()
         {
             List<OperationCategory> categoryModels = await _context.Categories.ToListAsync();
-            List<CategoryUpdateDto> categories = await _context.Categories
-               .Select(x => new CategoryUpdateDto
+            List<CategoryViewModel> categories = await _context.Categories
+               .Select(x => new CategoryViewModel
                {
                    Id = x.Id,
                    Name = x.Name,
@@ -68,7 +69,7 @@ namespace FinanceManagerAPI.Services
             return categories;
         }
 
-        public async Task<CategoryUpdateDto?> GetById(int id)
+        public async Task<CategoryViewModel?> GetById(int id)
         {
             OperationCategory? category = await _context.Categories
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -76,7 +77,7 @@ namespace FinanceManagerAPI.Services
             if (category is null)
                 throw new Exception($"There is no categories with this Id: {id}");
 
-            return new CategoryUpdateDto { Id = category.Id, Name = category.Name, Type = category.Type};
+            return new CategoryViewModel { Id = category.Id, Name = category.Name, Type = category.Type};
         }
 
         public async Task<bool> Update(CategoryUpdateDto expectedEntityValues)
