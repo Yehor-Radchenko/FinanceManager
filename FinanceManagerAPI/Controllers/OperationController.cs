@@ -1,4 +1,4 @@
-﻿using FinanceManagerAPI.Data;
+﻿using FinanceManagerAPI.Data.Operation;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services;
 using FinanceManagerAPI.Services.Interfaces;
@@ -17,18 +17,18 @@ namespace FinanceManagerAPI.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<OperationDto>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<OperationUpdateDto>))]
         public async Task<IActionResult> GetOperations()
         {
             return Ok(await _operationService.GetAll());
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("{id}")]
         [ProducesResponseType(200, Type = typeof(FinancialOperation))]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> GetOperation(int Id)
+        public async Task<IActionResult> GetOperation([FromRoute] int id)
         {
-            var operation = await _operationService.GetById(Id);
+            var operation = await _operationService.GetById(id);
             if (operation is null)
                 return NotFound();
 
@@ -36,35 +36,38 @@ namespace FinanceManagerAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostOperation([FromBody] OperationDto operation)
+        public async Task<IActionResult> PostOperation([FromBody] OperationCreateDto operation)
         {
-            await _operationService.Create(operation);
-            return Ok("Successfully created");
+            if(await _operationService.Create(operation))
+                return Ok("Successfully created");
+            else return BadRequest();
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutOperation(OperationDto operation)
+        public async Task<IActionResult> PutOperation([FromBody] OperationUpdateDto operation)
         {
-            await _operationService.Update(operation);
-            return Ok("Updated successfully.");
+            if(await _operationService.Update(operation))
+                return Ok("Updated successfully.");
+            else return BadRequest();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOperation(int id)
+        public async Task<IActionResult> DeleteOperation([FromRoute] int id)
         {
-            await _operationService.Delete(id);
-            return Ok("Deleted successfully.");
+            if (await _operationService.Delete(id))
+                return Ok("Deleted successfully.");
+            else return BadRequest();
         }
 
         [HttpGet("daily-report")]
-        public async Task<IActionResult> GetDailyReport(string date)
+        public async Task<IActionResult> GetDailyReport([FromQuery] string date)
         {
             var report = await _operationService.GetOperationsForPeriod(date);
             return Ok(report);
         }
 
         [HttpGet("period-report")]
-        public async Task<IActionResult> GetPeriodReport(string startDate, string endDate)
+        public async Task<IActionResult> GetPeriodReport([FromQuery] string startDate, [FromQuery] string endDate)
         {
             var report = await _operationService.GetOperationsForPeriod(startDate, endDate);
             return Ok(report);

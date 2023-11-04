@@ -1,7 +1,10 @@
-﻿namespace FinanceManagerAPI.Data
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FinanceManagerAPI.Data.Operation
 {
-    public class OperationDto
+    public class OperationUpdateDto
     {
+        [Required]
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }

@@ -1,4 +1,5 @@
 ﻿using FinanceManagerAPI.Data;
+using FinanceManagerAPI.Data.Operation;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Components.Forms;
@@ -16,40 +17,54 @@ namespace FinanceManagerAPI.Services
             _context = context;
         }
 
-        public async Task Create(OperationDto model)
+        public async Task<bool> Create(OperationCreateDto model)
         {
-            FinancialOperation operation = new FinancialOperation
+            try
             {
-                Id = model.Id,
-                Name = model.Name,
-                Description = model.Description,
-                MoneyAmount = model.MoneyAmount,
-                DateTime = model.DateTime,
-                CategoryId = model.CategoryId
-            };
+                FinancialOperation operation = new FinancialOperation
+                {
+                    Name = model.Name,
+                    Description = model.Description,
+                    MoneyAmount = model.MoneyAmount,
+                    DateTime = model.DateTime,
+                    CategoryId = model.CategoryId
+                };
+                _context.Operations.Add(operation);
+                await _context.SaveChangesAsync();
 
-            _context.Operations.Add(operation);
-            await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public async Task Delete(int? id)
+        public async Task<bool> Delete(int? id)
         {
             if (!await _context.Operations.AnyAsync(c => c.Id == id))
                 throw new Exception($"Operation with Id: {id} was not found");
-
-            FinancialOperation operation = new FinancialOperation { Id = id.Value };
-            _context.Entry(operation).State = EntityState.Deleted;
-            await _context.SaveChangesAsync();
+            try
+            {
+                FinancialOperation operation = new FinancialOperation { Id = id.Value };
+                _context.Entry(operation).State = EntityState.Deleted;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public async Task<IEnumerable<OperationDto>> GetAll()
+        public async Task<IEnumerable<OperationUpdateDto>> GetAll()
         {
-            List<OperationDto> operations = new List<OperationDto>();
+            List<OperationUpdateDto> operations = new List<OperationUpdateDto>();
             
             List<FinancialOperation> operationModels = await _context.Operations.ToListAsync();
             foreach (var i in operationModels)
             {
-                var operationDto = new OperationDto
+                var operationDto = new OperationUpdateDto
                 {
                     Id = i.Id,
                     Name = i.Name,
@@ -65,7 +80,7 @@ namespace FinanceManagerAPI.Services
             return operations;
         }
 
-        public async Task<OperationDto?> GetById(int? id)
+        public async Task<OperationUpdateDto?> GetById(int? id)
         {
             FinancialOperation? operation = await _context.Operations
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -73,7 +88,7 @@ namespace FinanceManagerAPI.Services
             if (operation is null)
                 throw new Exception($"There is no operations with this Id: {id}");
 
-            return new OperationDto 
+            return new OperationUpdateDto 
             { 
                 Id = operation.Id, 
                 Name = operation.Name,
@@ -84,17 +99,22 @@ namespace FinanceManagerAPI.Services
             };
         }
 
-        public async Task Update(OperationDto expectedEntityValues)
+        public async Task<bool> Update(OperationUpdateDto expectedEntityValues)
         {
             var existingOperation = await _context.Operations.FirstOrDefaultAsync(g => g.Id == expectedEntityValues.Id);
 
             if (existingOperation is null)
-            {
                 throw new ArgumentException("Operation with the specified ID does not exist.");
+            try
+            {
+                _context.Entry(existingOperation).CurrentValues.SetValues(expectedEntityValues);
+                await _context.SaveChangesAsync();
+                return true;
             }
-
-            _context.Entry(existingOperation).CurrentValues.SetValues(expectedEntityValues);
-            await _context.SaveChangesAsync();
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<ReportDto> GetOperationsForPeriod(string inputDate)
@@ -112,7 +132,7 @@ namespace FinanceManagerAPI.Services
 
             decimal? totalIncome = 0;
             decimal? totalExpense = 0;
-            var dayOperationsDto = new List<OperationDto>();
+            var dayOperationsDto = new List<OperationUpdateDto>();
 
             foreach (var operation in dayOperations)
             {
@@ -121,7 +141,7 @@ namespace FinanceManagerAPI.Services
                 if (operation.Category.Type is OperationType.Expense)
                     totalExpense += operation.MoneyAmount;
 
-                dayOperationsDto.Add(new OperationDto
+                dayOperationsDto.Add(new OperationUpdateDto
                 {
                     Id = operation.Id,
                     Name = operation.Name,
@@ -159,7 +179,7 @@ namespace FinanceManagerAPI.Services
 
             decimal? totalIncome = 0;
             decimal? totalExpense = 0;
-            var periodOperationsDto = new List<OperationDto>();
+            var periodOperationsDto = new List<OperationUpdateDto>();
 
             foreach (var operation in periodOperations)
             {
@@ -168,7 +188,7 @@ namespace FinanceManagerAPI.Services
                 if (operation.Category.Type is OperationType.Expense)
                     totalExpense += operation.MoneyAmount;
 
-                periodOperationsDto.Add(new OperationDto
+                periodOperationsDto.Add(new OperationUpdateDto
                 {
                     Id = operation.Id,
                     Name = operation.Name,

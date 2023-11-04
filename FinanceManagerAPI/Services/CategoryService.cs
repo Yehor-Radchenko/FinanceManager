@@ -1,5 +1,5 @@
 ﻿using Azure;
-using FinanceManagerAPI.Data;
+using FinanceManagerAPI.Data.Category;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -14,39 +14,52 @@ namespace FinanceManagerAPI.Services
             _context = context; 
         }
 
-        public async Task Create(CategoryDto model)
+        public async Task<bool> Create(CategoryCreateDto model)
         {
             if (_context.Categories.Where(c => c.Name.Trim().ToUpper() == model.Name.TrimEnd().ToUpper()).FirstOrDefault() is not null)
-            {
                 throw new Exception("Category with this name is already exists.");
-            }
-            OperationCategory category = new OperationCategory
+            try
             {
-                Id = model.Id,
-                Name = model.Name,
-                Type = model.Type
-            };
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
+                OperationCategory category = new OperationCategory
+                {
+                    Name = model.Name,
+                    Type = model.Type
+                };
+                _context.Categories.Add(category);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public async Task Delete(int? id)
+        public async Task<bool> Delete(int? id)
         {
             if (!await _context.Categories.AnyAsync(c => c.Id == id))
                 throw new Exception($"Сategory with Id: {id} was not found");
-
-            OperationCategory course = new OperationCategory { Id = id.Value };
-            _context.Entry(course).State = EntityState.Deleted;
-            await _context.SaveChangesAsync();
+            try
+            {
+                OperationCategory course = new OperationCategory { Id = id.Value };
+                _context.Entry(course).State = EntityState.Deleted;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public async Task<IEnumerable<CategoryDto>?> GetAll()
+        public async Task<IEnumerable<CategoryUpdateDto>?> GetAll()
         {
-            List<CategoryDto> categories = new List<CategoryDto>();
+            List<CategoryUpdateDto> categories = new List<CategoryUpdateDto>();
             List<OperationCategory> categoryModels = await _context.Categories.ToListAsync();
             foreach(var i in categoryModels)
             {
-                categories.Add(new CategoryDto 
+                categories.Add(new CategoryUpdateDto 
                 { 
                     Id = i.Id, 
                     Name = i.Name, 
@@ -56,7 +69,7 @@ namespace FinanceManagerAPI.Services
             return categories;
         }
 
-        public async Task<CategoryDto?> GetById(int id)
+        public async Task<CategoryUpdateDto?> GetById(int id)
         {
             OperationCategory? category = await _context.Categories
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -64,31 +77,33 @@ namespace FinanceManagerAPI.Services
             if (category is null)
                 throw new Exception($"There is no categories with this Id: {id}");
 
-            return new CategoryDto { Id = category.Id, Name = category.Name, Type = category.Type};
+            return new CategoryUpdateDto { Id = category.Id, Name = category.Name, Type = category.Type};
         }
 
-        public async Task Update(CategoryDto expectedEntityValues)
+        public async Task<bool> Update(CategoryUpdateDto expectedEntityValues)
         {
             var existingCategory = await _context.Categories.FirstOrDefaultAsync(g => g.Id == expectedEntityValues.Id);
 
             if (existingCategory is null)
-            {
                 throw new ArgumentException("Category with the specified ID does not exist.");
-            }
 
-            var categoryWithSameName = await _context.Categories.Where(c => 
-                c.Name.Trim().ToUpper() == expectedEntityValues.Name.TrimEnd().ToUpper() 
-                && c.Id != expectedEntityValues.Id)
-                .FirstOrDefaultAsync();
+            var categoryWithSameName = await _context.Categories.Where(c =>
+                    c.Name.Trim().ToUpper() == expectedEntityValues.Name.TrimEnd().ToUpper()
+                    && c.Id != expectedEntityValues.Id)
+                    .FirstOrDefaultAsync();
 
             if (categoryWithSameName is not null)
-            {
                 throw new Exception("Category with this name already exists.");
+            try
+            {
+                _context.Entry(existingCategory).CurrentValues.SetValues(expectedEntityValues);
+                await _context.SaveChangesAsync();
+                return true;
             }
-
-            _context.Entry(existingCategory).CurrentValues.SetValues(expectedEntityValues);
-
-            await _context.SaveChangesAsync();
+            catch
+            {
+                return false;
+            }
         }
 
         public async Task<bool> CategoryExists(int id)

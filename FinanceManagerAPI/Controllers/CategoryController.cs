@@ -1,4 +1,4 @@
-﻿using FinanceManagerAPI.Data;
+﻿using FinanceManagerAPI.Data.Category;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -17,7 +17,7 @@ namespace FinanceManagerAPI.Controllers
         }
 
         [HttpGet]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDto>))]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryUpdateDto>))]
         public async Task<IActionResult> GetCategories()
         {
             return Ok(await _categoryService.GetAll());
@@ -26,7 +26,7 @@ namespace FinanceManagerAPI.Controllers
         [HttpGet("{Id}")]
         [ProducesResponseType(200, Type = typeof(OperationCategory))]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> GetCategory(int Id)
+        public async Task<IActionResult> GetCategory([FromRoute] int Id)
         {
             var category = await _categoryService.GetById(Id);
             if (category is null)
@@ -36,24 +36,27 @@ namespace FinanceManagerAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostCategory([FromBody] CategoryDto category)
+        public async Task<IActionResult> PostCategory([FromBody] CategoryCreateDto category)
         {
-            await _categoryService.Create(category);
-            return Ok("Successfully created");
+            if (await _categoryService.Create(category))
+                return Ok("Successfully created");
+            else return BadRequest();
         }
 
         [HttpPut]
-        public async Task<IActionResult> PutCategory(CategoryDto category)
+        public async Task<IActionResult> PutCategory([FromBody] CategoryUpdateDto category)
         {
-            await _categoryService.Update(category);
-            return Ok("Updated successfully.");
+            if(await _categoryService.Update(category))
+                return Ok("Updated successfully.");
+            return BadRequest();
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(int id)
+        public async Task<IActionResult> DeleteCategory([FromRoute] int id)
         {
-            await _categoryService.Delete(id);
-            return Ok("Deleted successfully.");
+            if(await _categoryService.Delete(id))
+                return Ok("Deleted successfully.");
+            return BadRequest();
         }
     }
 }
