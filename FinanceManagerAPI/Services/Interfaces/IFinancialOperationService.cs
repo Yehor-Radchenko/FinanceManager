@@ -12,7 +12,5 @@ namespace FinanceManagerAPI.Services.Interfaces
         public Task<IEnumerable<OperationUpdateDto>> GetAll();
         public Task<OperationUpdateDto?> GetById(int? id);
         public Task<bool> Update(OperationUpdateDto expectedEntityValues);
-        public Task<ReportDto> GetOperationsForPeriod(string date);
-        public Task<ReportDto> GetOperationsForPeriod(string startDate, string endDate);
     }
 }

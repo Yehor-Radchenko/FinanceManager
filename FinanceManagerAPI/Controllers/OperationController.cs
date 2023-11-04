@@ -58,19 +58,5 @@ namespace FinanceManagerAPI.Controllers
                 return Ok("Deleted successfully.");
             else return BadRequest();
         }
-
-        [HttpGet("daily-report")]
-        public async Task<IActionResult> GetDailyReport([FromQuery] string date)
-        {
-            var report = await _operationService.GetOperationsForPeriod(date);
-            return Ok(report);
-        }
-
-        [HttpGet("period-report")]
-        public async Task<IActionResult> GetPeriodReport([FromQuery] string startDate, [FromQuery] string endDate)
-        {
-            var report = await _operationService.GetOperationsForPeriod(startDate, endDate);
-            return Ok(report);
-        }
     }
 }

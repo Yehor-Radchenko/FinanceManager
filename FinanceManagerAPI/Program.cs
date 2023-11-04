@@ -11,6 +11,7 @@ builder.Services.AddDbContext<FinanceManagerDbContext>(options =>
 
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IFinancialOperationService, FinancialOperationService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
