@@ -29,9 +29,6 @@ namespace FinanceManagerAPI.Controllers
         public async Task<IActionResult> GetCategory([FromRoute] int Id)
         {
             var category = await _categoryService.GetById(Id);
-            if (category is null)
-                return NotFound();
-
             return Ok(category);
         }
 

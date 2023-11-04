@@ -29,9 +29,6 @@ namespace FinanceManagerAPI.Controllers
         public async Task<IActionResult> GetOperation([FromRoute] int id)
         {
             var operation = await _operationService.GetById(id);
-            if (operation is null)
-                return NotFound();
-
             return Ok(operation);
         }
 

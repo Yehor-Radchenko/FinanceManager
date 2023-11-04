@@ -62,23 +62,19 @@ namespace FinanceManagerAPI.Services
 
         public async Task<IEnumerable<OperationUpdateDto>> GetAll()
         {
-            List<OperationUpdateDto> operations = new List<OperationUpdateDto>();
             
             List<FinancialOperation> operationModels = await _context.Operations.ToListAsync();
-            foreach (var i in operationModels)
-            {
-                var operationDto = new OperationUpdateDto
+            List<OperationUpdateDto> operations = await _context.Operations
+                .Select(x => new OperationUpdateDto
                 {
-                    Id = i.Id,
-                    Name = i.Name,
-                    Description = i.Description,
-                    MoneyAmount = i.MoneyAmount,
-                    DateTime = i.DateTime,
-                    CategoryId = i.CategoryId
-                };
-
-                operations.Add(operationDto);
-            }
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    MoneyAmount = x.MoneyAmount,
+                    DateTime = x.DateTime,
+                    CategoryId = x.CategoryId,
+                })
+                .ToListAsync();
 
             return operations;
         }

@@ -96,7 +96,6 @@ namespace FinanceManagerAPI.Services
                     CategoryId = operation.Category.Id
                 });
             }
-
             var report = new ReportDto
             {
                 TotalIncome = totalIncome,

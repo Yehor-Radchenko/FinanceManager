@@ -16,7 +16,7 @@ namespace FinanceManagerAPI.Services
 
         public async Task<bool> Create(CategoryCreateDto model)
         {
-            if (_context.Categories.Where(c => c.Name.Trim().ToUpper() == model.Name.TrimEnd().ToUpper()).FirstOrDefault() is not null)
+            if (_context.Categories.Where(c => c.Name.Trim().ToUpper() == model.Name.Trim().ToUpper()).FirstOrDefault() is not null)
                 throw new Exception("Category with this name is already exists.");
             try
             {
@@ -55,17 +55,16 @@ namespace FinanceManagerAPI.Services
 
         public async Task<IEnumerable<CategoryUpdateDto>?> GetAll()
         {
-            List<CategoryUpdateDto> categories = new List<CategoryUpdateDto>();
             List<OperationCategory> categoryModels = await _context.Categories.ToListAsync();
-            foreach(var i in categoryModels)
-            {
-                categories.Add(new CategoryUpdateDto 
-                { 
-                    Id = i.Id, 
-                    Name = i.Name, 
-                    Type = i.Type 
-                });
-            }
+            List<CategoryUpdateDto> categories = await _context.Categories
+               .Select(x => new CategoryUpdateDto
+               {
+                   Id = x.Id,
+                   Name = x.Name,
+                   Type = x.Type
+               })
+               .ToListAsync();
+
             return categories;
         }
 
@@ -88,7 +87,7 @@ namespace FinanceManagerAPI.Services
                 throw new ArgumentException("Category with the specified ID does not exist.");
 
             var categoryWithSameName = await _context.Categories.Where(c =>
-                    c.Name.Trim().ToUpper() == expectedEntityValues.Name.TrimEnd().ToUpper()
+                    c.Name.Trim().ToUpper() == expectedEntityValues.Name.Trim().ToUpper()
                     && c.Id != expectedEntityValues.Id)
                     .FirstOrDefaultAsync();
 
