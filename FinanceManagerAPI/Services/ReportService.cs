@@ -29,8 +29,8 @@ namespace FinanceManagerAPI.Services
                 .Include(o => o.Category)
                 .ToListAsync();
 
-            decimal? totalIncome = 0;
-            decimal? totalExpense = 0;
+            decimal totalIncome = 0;
+            decimal totalExpense = 0;
             var dayOperationsDto = new List<OperationUpdateDto>();
 
             foreach (var operation in dayOperations)
@@ -79,8 +79,8 @@ namespace FinanceManagerAPI.Services
                 .Include(o => o.Category)
                 .ToListAsync();
 
-            decimal? totalIncome = 0;
-            decimal? totalExpense = 0;
+            decimal totalIncome = 0;
+            decimal totalExpense = 0;
             var periodOperationsDto = new List<OperationUpdateDto>();
 
             foreach (var operation in periodOperations)
