@@ -1,7 +1,8 @@
-﻿namespace FinanceManagerAPI.Data.Operation
+﻿namespace FinanceManagerAPI.ViewModels
 {
-    public class OperationCreateDto
+    public class OperationViewModel
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal MoneyAmount { get; set; }

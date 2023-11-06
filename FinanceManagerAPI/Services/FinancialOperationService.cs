@@ -1,7 +1,7 @@
-﻿using FinanceManagerAPI.Data;
-using FinanceManagerAPI.Data.Operation;
+﻿using FinanceManagerAPI.Data.Operation;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services.Interfaces;
+using FinanceManagerAPI.ViewModels;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -60,12 +60,11 @@ namespace FinanceManagerAPI.Services
             }
         }
 
-        public async Task<IEnumerable<OperationUpdateDto>> GetAll()
+        public async Task<IEnumerable<OperationViewModel>> GetAll()
         {
-            
             List<FinancialOperation> operationModels = await _context.Operations.ToListAsync();
-            List<OperationUpdateDto> operations = await _context.Operations
-                .Select(x => new OperationUpdateDto
+            List<OperationViewModel> operations = await _context.Operations
+                .Select(x => new OperationViewModel
                 {
                     Id = x.Id,
                     Name = x.Name,
@@ -79,7 +78,7 @@ namespace FinanceManagerAPI.Services
             return operations;
         }
 
-        public async Task<OperationUpdateDto?> GetById(int? id)
+        public async Task<OperationViewModel?> GetById(int? id)
         {
             FinancialOperation? operation = await _context.Operations
                 .FirstOrDefaultAsync(p => p.Id == id);
@@ -87,7 +86,7 @@ namespace FinanceManagerAPI.Services
             if (operation is null)
                 throw new Exception($"There is no operations with this Id: {id}");
 
-            return new OperationUpdateDto 
+            return new OperationViewModel
             { 
                 Id = operation.Id, 
                 Name = operation.Name,
@@ -119,7 +118,7 @@ namespace FinanceManagerAPI.Services
             }
         }
 
-        public async Task<ReportDto> GetOperationsForPeriod(string inputDate)
+        public async Task<ReportViewModel> GetOperationsForPeriod(string inputDate)
         {
             if (!DateTime.TryParseExact(inputDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedDate))
             {
@@ -153,7 +152,7 @@ namespace FinanceManagerAPI.Services
                     CategoryId = operation.Category.Id
                 });
             }
-            var report = new ReportDto
+            var report = new ReportViewModel
             {
                 TotalIncome = totalIncome,
                 TotalExpense = totalExpense,
@@ -163,7 +162,7 @@ namespace FinanceManagerAPI.Services
             return report;
         }
 
-        public async Task<ReportDto> GetOperationsForPeriod(string startDate, string endDate)
+        public async Task<ReportViewModel> GetOperationsForPeriod(string startDate, string endDate)
         {
             if (!(DateTime.TryParseExact(startDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedStartDate)
                 && DateTime.TryParseExact(endDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedEndDate)))
@@ -201,7 +200,7 @@ namespace FinanceManagerAPI.Services
                 });
             }
 
-            var report = new ReportDto
+            var report = new ReportViewModel
             {
                 TotalIncome = totalIncome,
                 TotalExpense = totalExpense,

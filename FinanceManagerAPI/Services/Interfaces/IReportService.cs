@@ -1,10 +1,11 @@
 ﻿using FinanceManagerAPI.Data;
+using FinanceManagerAPI.ViewModels;
 
 namespace FinanceManagerAPI.Services.Interfaces
 {
     public interface IReportService
     {
-        public Task<ReportDto> GetOperationsForPeriod(string date);
-        public Task<ReportDto> GetOperationsForPeriod(string startDate, string endDate);
+        public Task<ReportViewModel> GetOperationsForPeriod(string date);
+        public Task<ReportViewModel> GetOperationsForPeriod(string startDate, string endDate);
     }
 }

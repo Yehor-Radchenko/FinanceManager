@@ -2,6 +2,7 @@
 using FinanceManagerAPI.Data.Operation;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services.Interfaces;
+using FinanceManagerAPI.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
@@ -15,7 +16,7 @@ namespace FinanceManagerAPI.Services
             _context = context;
         }
 
-        public async Task<ReportDto> GetOperationsForPeriod(string inputDate)
+        public async Task<ReportViewModel> GetOperationsForPeriod(string inputDate)
         {
             if (!DateTime.TryParseExact(inputDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedDate))
             {
@@ -28,8 +29,8 @@ namespace FinanceManagerAPI.Services
                 .Include(o => o.Category)
                 .ToListAsync();
 
-            decimal? totalIncome = 0;
-            decimal? totalExpense = 0;
+            decimal totalIncome = 0;
+            decimal totalExpense = 0;
             var dayOperationsDto = new List<OperationUpdateDto>();
 
             foreach (var operation in dayOperations)
@@ -49,7 +50,7 @@ namespace FinanceManagerAPI.Services
                     CategoryId = operation.Category.Id
                 });
             }
-            var report = new ReportDto
+            var report = new ReportViewModel
             {
                 TotalIncome = totalIncome,
                 TotalExpense = totalExpense,
@@ -59,7 +60,7 @@ namespace FinanceManagerAPI.Services
             return report;
         }
 
-        public async Task<ReportDto> GetOperationsForPeriod(string startDate, string endDate)
+        public async Task<ReportViewModel> GetOperationsForPeriod(string startDate, string endDate)
         {
             if (!(DateTime.TryParseExact(startDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedStartDate)
                 && DateTime.TryParseExact(endDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedEndDate)))
@@ -70,13 +71,16 @@ namespace FinanceManagerAPI.Services
             var formattedStartDate = checkedStartDate.Date;
             var formattedEndDate = checkedEndDate.Date;
 
+            if (formattedStartDate > formattedEndDate)
+                throw new Exception("Start date cannot be later than end date.");
+
             var periodOperations = await _context.Operations
                 .Where(o => o.DateTime.Date >= formattedStartDate && o.DateTime.Date <= formattedEndDate)
                 .Include(o => o.Category)
                 .ToListAsync();
 
-            decimal? totalIncome = 0;
-            decimal? totalExpense = 0;
+            decimal totalIncome = 0;
+            decimal totalExpense = 0;
             var periodOperationsDto = new List<OperationUpdateDto>();
 
             foreach (var operation in periodOperations)
@@ -96,7 +100,7 @@ namespace FinanceManagerAPI.Services
                     CategoryId = operation.Category.Id
                 });
             }
-            var report = new ReportDto
+            var report = new ReportViewModel
             {
                 TotalIncome = totalIncome,
                 TotalExpense = totalExpense,
