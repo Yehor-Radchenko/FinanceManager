@@ -6,6 +6,6 @@ namespace FinanceManagerAPI.ViewModels
     {
         public decimal? TotalIncome { get; set; }
         public decimal? TotalExpense { get; set; }
-        public List<OperationUpdateDto>? operationsForPeriod { get; set; }
+        public List<OperationViewModel>? operationsForPeriod { get; set; }
     }
 }

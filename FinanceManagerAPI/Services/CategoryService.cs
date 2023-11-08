@@ -57,27 +57,41 @@ namespace FinanceManagerAPI.Services
         public async Task<IEnumerable<CategoryViewModel>?> GetAll()
         {
             List<OperationCategory> categoryModels = await _context.Categories.ToListAsync();
+
+            Dictionary<OperationType, string> typeMappings = new Dictionary<OperationType, string>
+            {
+                { OperationType.Income, "Income" },
+                { OperationType.Expense, "Expense" }
+            };
+
             List<CategoryViewModel> categories = await _context.Categories
-               .Select(x => new CategoryViewModel
-               {
-                   Id = x.Id,
-                   Name = x.Name,
-                   Type = x.Type
-               })
-               .ToListAsync();
+                .Select(x => new CategoryViewModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Type = typeMappings.ContainsKey(x.Type) ? typeMappings[x.Type] : "Unknown"
+                })
+                .ToListAsync();
 
             return categories;
         }
+
 
         public async Task<CategoryViewModel?> GetById(int id)
         {
             OperationCategory? category = await _context.Categories
                 .FirstOrDefaultAsync(p => p.Id == id);
 
+            Dictionary<OperationType, string> typeMappings = new Dictionary<OperationType, string>
+            {
+                { OperationType.Income, "Income" },
+                { OperationType.Expense, "Expense" }
+            };
+
             if (category is null)
                 throw new Exception($"There is no categories with this Id: {id}");
 
-            return new CategoryViewModel { Id = category.Id, Name = category.Name, Type = category.Type};
+            return new CategoryViewModel { Id = category.Id, Name = category.Name, Type = typeMappings.ContainsKey(category.Type) ? typeMappings[category.Type] : "Unknown" };
         }
 
         public async Task<bool> Update(CategoryUpdateDto expectedEntityValues)

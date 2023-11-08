@@ -31,7 +31,7 @@ namespace FinanceManagerAPI.Services
 
             decimal totalIncome = 0;
             decimal totalExpense = 0;
-            var dayOperationsDto = new List<OperationUpdateDto>();
+            var dayOperationViewModels = new List<OperationViewModel>();
 
             foreach (var operation in dayOperations)
             {
@@ -40,21 +40,21 @@ namespace FinanceManagerAPI.Services
                 if (operation.Category.Type is OperationType.Expense)
                     totalExpense += operation.MoneyAmount;
 
-                dayOperationsDto.Add(new OperationUpdateDto
+                dayOperationViewModels.Add(new OperationViewModel
                 {
                     Id = operation.Id,
                     Name = operation.Name,
                     Description = operation.Description,
                     DateTime = operation.DateTime,
                     MoneyAmount = operation.MoneyAmount,
-                    CategoryId = operation.Category.Id
+                    CategoryName = _context.Categories.FirstOrDefault(c => c.Id == operation.Category.Id).Name 
                 });
             }
             var report = new ReportViewModel
             {
                 TotalIncome = totalIncome,
                 TotalExpense = totalExpense,
-                operationsForPeriod = dayOperationsDto
+                operationsForPeriod = dayOperationViewModels
             };
 
             return report;
@@ -81,7 +81,7 @@ namespace FinanceManagerAPI.Services
 
             decimal totalIncome = 0;
             decimal totalExpense = 0;
-            var periodOperationsDto = new List<OperationUpdateDto>();
+            var periodOperationViewModel = new List<OperationViewModel>();
 
             foreach (var operation in periodOperations)
             {
@@ -90,21 +90,21 @@ namespace FinanceManagerAPI.Services
                 if (operation.Category.Type is OperationType.Expense)
                     totalExpense += operation.MoneyAmount;
 
-                periodOperationsDto.Add(new OperationUpdateDto
+                periodOperationViewModel.Add(new OperationViewModel
                 {
                     Id = operation.Id,
                     Name = operation.Name,
                     Description = operation.Description,
                     DateTime = operation.DateTime,
                     MoneyAmount = operation.MoneyAmount,
-                    CategoryId = operation.Category.Id
+                    CategoryName = _context.Categories.FirstOrDefault(c => c.Id == operation.Category.Id).Name
                 });
             }
             var report = new ReportViewModel
             {
                 TotalIncome = totalIncome,
                 TotalExpense = totalExpense,
-                operationsForPeriod = periodOperationsDto
+                operationsForPeriod = periodOperationViewModel
             };
 
             return report;

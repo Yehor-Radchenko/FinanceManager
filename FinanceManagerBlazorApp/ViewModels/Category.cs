@@ -1,8 +1,6 @@
-﻿using FinanceManagerAPI.Models;
-
-namespace FinanceManagerAPI.ViewModels
+﻿namespace FinanceManagerBlazorApp.ViewModels
 {
-    public class CategoryViewModel
+    public class Category
     {
         public int Id { get; set; }
         public string Name { get; set; }

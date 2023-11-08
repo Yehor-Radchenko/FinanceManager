@@ -1,6 +1,6 @@
-﻿namespace FinanceManagerAPI.ViewModels
+﻿namespace FinanceManagerBlazorApp.ViewModels
 {
-    public class OperationViewModel
+    public class Operation
     {
         public int Id { get; set; }
         public string Name { get; set; }
