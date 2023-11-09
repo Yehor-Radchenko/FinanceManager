@@ -1,0 +1,55 @@
+﻿@page "/operations"
+
+@using System.Text.Json
+@using FinanceManagerBlazorApp.ViewModels;
+@using MudBlazor
+
+@layout _Layout
+
+@inject IHttpClientFactory ClientFactory
+
+<h1 class="mb-4">Operations</h1>
+
+<MudTable Items="@_operations" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Description</MudTh>
+        <MudTh>Money amount</MudTh>
+        <MudTh>Date & Time</MudTh>
+        <MudTh>Category</MudTh>
+    </HeaderContent>
+
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Description">@context.Description</MudTd>
+        <MudTd DataLabel="Money amount">@context.MoneyAmount</MudTd>
+        <MudTd DataLabel="Date & Time">@context.DateTime</MudTd>
+        <MudTd DataLabel="Category">@context.CategoryName</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    List<Operation> _operations = new List<Operation>();
+    bool _drawerOpen = false;
+
+    protected override async Task OnInitializedAsync() => await LoadData();
+
+    async Task LoadData()
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        _operations = await httpClient.GetFromJsonAsync<List<Operation>>("/api/operation") ?? _operations;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
