@@ -10,23 +10,35 @@
 
 <h1 class="mb-4">Categories</h1>
 
-<MudTable Items="@_categories" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
-    <HeaderContent>
-        <MudTh>Id</MudTh>
-        <MudTh>Name</MudTh>
-        <MudTh>Type</MudTh>
-    </HeaderContent>
+<MudDataGrid T="Category" Items="@_categories" ReadOnly="false" Hover="true" Breakpoint="Breakpoint.Sm"
+             CommittedItemChanges="@CommittedItemChanges" EditMode="DataGridEditMode.Form"
+             LoadingProgressColor="Color.Info" EditTrigger="DataGridEditTrigger.OnRowClick">
 
-    <RowTemplate>
-        <MudTd DataLabel="Id">@context.Id</MudTd>
-        <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Type">@context.Type</MudTd>
-    </RowTemplate>
-</MudTable>
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="Id" IsEditable="false" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Type">
+            <EditTemplate>
+                <MudSelect @bind-Value="context.Item.Type" Required RequiredError="You must select a Type!!!" Margin="@Margin.Dense">
+                     <MudSelectItem Value="1">Income</MudSelectItem>
+                     <MudSelectItem Value="2">Expense</MudSelectItem>
+                 </MudSelect>
+             </EditTemplate>
+             <CellTemplate>
+                 @DisplayType(context.Item)
+             </CellTemplate>
+         </PropertyColumn>
+         
+     </Columns>
+ </MudDataGrid>
 
-@code {
+
+ @code {
     List<Category> _categories = new List<Category>();
+
     bool _drawerOpen = false;
+
+    private List<string> _events = new();
 
     protected override async Task OnInitializedAsync() => await LoadData();
 
@@ -45,5 +57,25 @@
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    async Task CommittedItemChanges(Category item)
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        HttpResponseMessage response = await httpClient.PutAsJsonAsync("/api/category", item);
+    }
+
+    string DisplayType(Category item)
+    {
+        switch (item.Type)
+        {
+            case 1:
+                return "Income";
+            case 2:
+                return "Expense";
+            default:
+                return "Unknown";
+        }
     }
 }
