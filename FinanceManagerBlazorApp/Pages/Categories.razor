@@ -2,6 +2,7 @@
 
 @using System.Text.Json
 @using FinanceManagerBlazorApp.ViewModels;
+@using Microsoft.AspNetCore.Components.Forms
 @using MudBlazor
 
 @layout _Layout
@@ -28,17 +29,44 @@
                  @DisplayType(context.Item)
              </CellTemplate>
          </PropertyColumn>
-         
      </Columns>
  </MudDataGrid>
 
+ <style>
+    .add-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+</style>
+
+<MudButton Class="add-button" Color="Color.Primary" Variant="Variant.Filled" @onclick="OpenAddCategoryDialog">Add</MudButton>
+
+ <MudDialog @bind-IsVisible="@_isAddCategoryDialogOpen">
+     <DialogContent>
+         <div style="text-align: center; padding-bottom: 16px;">
+             <h3>Add new category</h3>
+         </div>
+         <MudForm Model="@category">
+             <MudTextField @bind-Value="@category.Name" Label="Name" Required="true" />
+             <MudSelect @bind-Value="@category.Type" Label="Type" Required="true">
+                 <MudSelectItem Value="0">*select type*</MudSelectItem>
+                 <MudSelectItem Value="1">Income</MudSelectItem>
+                 <MudSelectItem Value="2">Expense</MudSelectItem>
+             </MudSelect>
+         </MudForm>
+     </DialogContent>
+     <DialogActions>
+         <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveCategoryClick">Save</MudButton>
+         <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="CloseAddCategoryDialog">Cancel</MudButton>
+     </DialogActions>
+ </MudDialog>
 
  @code {
     List<Category> _categories = new List<Category>();
-
+    bool _isAddCategoryDialogOpen = false;
+    Category category = new Category();
     bool _drawerOpen = false;
-
-    private List<string> _events = new();
 
     protected override async Task OnInitializedAsync() => await LoadData();
 
@@ -77,5 +105,22 @@
             default:
                 return "Unknown";
         }
+    }
+
+    void OpenAddCategoryDialog()
+    {
+        _isAddCategoryDialogOpen = true;
+    }
+
+    void CloseAddCategoryDialog()
+    {
+        _isAddCategoryDialogOpen = false;
+    }
+    private async Task SaveCategoryClick()
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync<Category>("/api/category", category);
+        CloseAddCategoryDialog();
     }
 }
