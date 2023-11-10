@@ -7,6 +7,7 @@
 @layout _Layout
 
 @inject IHttpClientFactory ClientFactory
+@inject ISnackbar Snackbar
 
 <h1 class="mb-4">Operations</h1>
 
@@ -33,9 +34,45 @@
     </Columns>
 </MudDataGrid>
 
- @code {
+<style>
+    .add-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+    }
+</style>
+
+<MudButton Class="add-button" Color="Color.Primary" Variant="Variant.Filled" @onclick="@OpenAddOperationDialog">Add</MudButton>
+
+<MudDialog @bind-IsVisible="@_isAddOperationDialogOpen">
+    <DialogContent>
+        <div style="text-align: center; padding-bottom: 16px;">
+            <h3>Add new operation</h3>
+        </div>
+        <MudForm Model="@operation">
+            <MudTextField @bind-Value="@operation.Name" Label="Name" Required="true" />
+            <MudTextField @bind-Value="@operation.Description" Label="Description" Required="true" />
+            <MudNumericField @bind-Value="@operation.MoneyAmount" Label="Money amount" Required="true" />
+            <MudDatePicker For="@(() => operation.DateTime)" Label="Date & Time" />
+            <MudSelect @bind-Value="@operation.CategoryId" Label="Type" Required="true">
+                @foreach (var category in _categories)
+                {
+                    <MudSelectItem Value="category.Id">@category.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveOperationClick">Save</MudButton>
+        <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="CloseAddOperationDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
     List<Operation> _operations = new List<Operation>();
     List<Category> _categories = new List<Category>();
+    Operation operation = new Operation();
+    bool _isAddOperationDialogOpen = false;
     bool _drawerOpen = false;
 
     protected override async Task OnInitializedAsync() => await LoadData();
@@ -71,5 +108,24 @@
         HttpClient httpClient = ClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri("https://localhost:7016");
         HttpResponseMessage response = await httpClient.PutAsJsonAsync("/api/operation", item);
+    }
+
+    void CloseAddOperationDialog()
+    {
+        _isAddOperationDialogOpen = false;
+    }
+
+    private async Task SaveOperationClick()
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync<Operation>("/api/operation", operation);
+        CloseAddOperationDialog();
+        Snackbar.Add("Saved successfully.", Severity.Success);
+    }
+
+    void OpenAddOperationDialog()
+    {
+        _isAddOperationDialogOpen = true;
     }
 }
