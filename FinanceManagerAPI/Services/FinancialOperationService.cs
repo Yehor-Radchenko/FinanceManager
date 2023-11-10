@@ -71,7 +71,7 @@ namespace FinanceManagerAPI.Services
                     Description = x.Description,
                     MoneyAmount = x.MoneyAmount,
                     DateTime = x.DateTime,
-                    CategoryName =  _context.Categories.FirstOrDefault(c => c.Id == x.CategoryId).Name
+                    CategoryId =  x.CategoryId
                 }) 
                 .ToListAsync();
 
@@ -93,7 +93,7 @@ namespace FinanceManagerAPI.Services
                 Description = operation.Description,
                 MoneyAmount = operation.MoneyAmount,
                 DateTime = operation.DateTime,
-                CategoryName = _context.Categories.FirstOrDefault(c => c.Id == id).Name
+                CategoryId = operation.CategoryId
             };
         }
 
@@ -116,50 +116,6 @@ namespace FinanceManagerAPI.Services
             {
                 return false;
             }
-        }
-
-        public async Task<ReportViewModel> GetOperationsForPeriod(string inputDate)
-        {
-            if (!DateTime.TryParseExact(inputDate, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var checkedDate))
-            {
-                throw new Exception("Invalid date format. Use format: dd.MM.yyyy");
-            }
-
-            var formattedDate = checkedDate.Date;
-            var dayOperations = await _context.Operations
-                .Where(o => EF.Functions.DateDiffDay(o.DateTime, formattedDate) == 0)
-                .Include(o => o.Category)
-                .ToListAsync();
-
-            decimal? totalIncome = 0;
-            decimal? totalExpense = 0;
-            var dayOperationViewModels = new List<OperationViewModel>();
-
-            foreach (var operation in dayOperations)
-            {
-                if (operation.Category.Type is OperationType.Income)
-                    totalIncome += operation.MoneyAmount;
-                if (operation.Category.Type is OperationType.Expense)
-                    totalExpense += operation.MoneyAmount;
-
-                dayOperationViewModels.Add(new OperationViewModel
-                {
-                    Id = operation.Id,
-                    Name = operation.Name,
-                    Description = operation.Description,
-                    DateTime = operation.DateTime,
-                    MoneyAmount = operation.MoneyAmount,
-                    CategoryName = _context.Operations.FirstOrDefault(c => c.Id == operation.Category.Id).Name
-                });
-            }
-            var report = new ReportViewModel
-            {
-                TotalIncome = totalIncome,
-                TotalExpense = totalExpense,
-                operationsForPeriod = dayOperationViewModels
-            };
-
-            return report;
         }
     }
 }

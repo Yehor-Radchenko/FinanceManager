@@ -47,7 +47,7 @@ namespace FinanceManagerAPI.Services
                     Description = operation.Description,
                     DateTime = operation.DateTime,
                     MoneyAmount = operation.MoneyAmount,
-                    CategoryName = _context.Categories.FirstOrDefault(c => c.Id == operation.Category.Id).Name 
+                    CategoryId = operation.CategoryId 
                 });
             }
             var report = new ReportViewModel
@@ -97,7 +97,7 @@ namespace FinanceManagerAPI.Services
                     Description = operation.Description,
                     DateTime = operation.DateTime,
                     MoneyAmount = operation.MoneyAmount,
-                    CategoryName = _context.Categories.FirstOrDefault(c => c.Id == operation.Category.Id).Name
+                    CategoryId = operation.CategoryId
                 });
             }
             var report = new ReportViewModel
