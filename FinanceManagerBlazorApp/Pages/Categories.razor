@@ -47,12 +47,12 @@
 </style>
 
 <MudButton Class="add-button" Color="Color.Primary" Variant="Variant.Filled" @onclick="OpenAddCategoryDialog">Add</MudButton>
-
+ 
  <MudDialog @bind-IsVisible="@_isAddCategoryDialogOpen">
      <DialogContent>
          <div style="text-align: center; padding-bottom: 16px;">
-             <h3>Add new category</h3>
-         </div>
+            <h3>Add new category</h3>
+        </div>
          <MudForm Model="@category">
              <MudTextField @bind-Value="@category.Name" Label="Name" Required="true" />
              <MudSelect @bind-Value="@category.Type" Label="Type" Required="true">
@@ -144,6 +144,7 @@
         HttpResponseMessage response = await httpClient.PostAsJsonAsync<Category>("/api/category", category);
         CloseAddCategoryDialog();
         Snackbar.Add("Saved successfully.", Severity.Success);
+        await LoadData();
     }
 
     private async Task ConfirmDelete()

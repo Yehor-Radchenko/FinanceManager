@@ -21,15 +21,15 @@
         <PropertyColumn Property="x => x.Description" />
         <PropertyColumn Property="x => x.MoneyAmount" Title="Money amount" />
         <PropertyColumn Property="x => x.DateTime" Title="Date & Time" IsEditable="false" />
-        <PropertyColumn Property="x => _categories.FirstOrDefault(category => category.Id == x.CategoryId).Name" Title="Category">
+        <PropertyColumn Property="x => x.CategoryId" Title="Category">
             <EditTemplate>
-                <MudSelect  @bind-Value="context.Item.CategoryId" Required RequiredError="You must select a Category!!!" Margin="@Margin.Dense">
+                <MudSelect @bind-Value="context.Item.CategoryId" Required RequiredError="You must select a Category!!!" Margin="@Margin.Dense">
                      @foreach (var category in _categories)
                     {
                         <MudSelectItem Value="category.Id">@category.Name</MudSelectItem>
                     }
                 </MudSelect>
-             </EditTemplate>
+            </EditTemplate>
         </PropertyColumn>
     </Columns>
 </MudDataGrid>
@@ -43,24 +43,26 @@
 </style>
 
 <MudButton Class="add-button" Color="Color.Primary" Variant="Variant.Filled" @onclick="@OpenAddOperationDialog">Add</MudButton>
-
-<MudDialog @bind-IsVisible="@_isAddOperationDialogOpen">
-    <DialogContent>
-        <div style="text-align: center; padding-bottom: 16px;">
-            <h3>Add new operation</h3>
-        </div>
-        <MudForm Model="@operation">
-            <MudTextField @bind-Value="@operation.Name" Label="Name" Required="true" />
-            <MudTextField @bind-Value="@operation.Description" Label="Description" Required="true" />
-            <MudNumericField @bind-Value="@operation.MoneyAmount" Label="Money amount" Required="true" />
-            <MudDatePicker For="@(() => operation.DateTime)" Label="Date & Time" />
-            <MudSelect @bind-Value="@operation.CategoryId" Label="Type" Required="true">
-                @foreach (var category in _categories)
-                {
-                    <MudSelectItem Value="category.Id">@category.Name</MudSelectItem>
-                }
-            </MudSelect>
-        </MudForm>
+<MudDialog @bind-IsVisible="@_isAddOperationDialogOpen" DisableSidePadding="true" Options="@dialogWidthOptions">
+    <DialogContent >
+        <MudContainer Style="overflow-y: scroll">
+            <div style="text-align: center; padding-bottom: 16px;">
+                <h3>Add new operation</h3>
+            </div>
+            <MudForm Model="@operation">
+                <MudTextField @bind-Value="@operation.Name" Label="Name" Required="true" />
+                <MudTextField @bind-Value="@operation.Description" Label="Description" Required="true" />
+                <MudNumericField @bind-Value="@operation.MoneyAmount" Label="Money amount" Required="true" />
+                <MudDatePicker AutoClose="true" @bind-Date="@date" Editable="true" Label="Date" PickerVariant="PickerVariant.Dialog" />
+                <MudTimePicker @bind-Time="@time" Label="Time" Editable="true" PickerVariant="PickerVariant.Dialog" />
+                <MudSelect @bind-Value="@operation.CategoryId" Label="Type" Required="true" >
+                    @foreach (var category in _categories)
+                    {
+                        <MudSelectItem Value="category.Id">@category.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudForm>
+        </MudContainer>
     </DialogContent>
     <DialogActions>
         <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveOperationClick">Save</MudButton>
@@ -74,6 +76,13 @@
     Operation operation = new Operation();
     bool _isAddOperationDialogOpen = false;
     bool _drawerOpen = false;
+    DialogOptions dialogWidthOptions = new DialogOptions()
+    {
+        MaxWidth = MaxWidth.Small,
+        FullWidth = true
+    };
+    DateTime? date = DateTime.Now;
+    TimeSpan? time = DateTime.Now.TimeOfDay;
 
     protected override async Task OnInitializedAsync() => await LoadData();
 
@@ -108,6 +117,7 @@
         HttpClient httpClient = ClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri("https://localhost:7016");
         HttpResponseMessage response = await httpClient.PutAsJsonAsync("/api/operation", item);
+        await LoadData();
     }
 
     void CloseAddOperationDialog()
@@ -119,9 +129,11 @@
     {
         HttpClient httpClient = ClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri("https://localhost:7016");
+        operation.DateTime = new DateTime(date.Value.Year, date.Value.Month, date.Value.Day, time.Value.Hours, time.Value.Minutes, 0);
         HttpResponseMessage response = await httpClient.PostAsJsonAsync<Operation>("/api/operation", operation);
         CloseAddOperationDialog();
         Snackbar.Add("Saved successfully.", Severity.Success);
+        await LoadData();
     }
 
     void OpenAddOperationDialog()
