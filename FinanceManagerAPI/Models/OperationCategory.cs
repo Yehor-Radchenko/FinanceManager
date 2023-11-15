@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+using FinanceManagerCommon.Enums;
 namespace FinanceManagerAPI.Models
 {
     public class OperationCategory
