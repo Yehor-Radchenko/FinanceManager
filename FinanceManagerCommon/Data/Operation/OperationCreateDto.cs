@@ -1,8 +1,7 @@
-﻿namespace FinanceManagerBlazorApp.ViewModels
+﻿namespace FinanceManagerCommon.Data
 {
-    public class Operation
+    public class OperationCreateDto
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal MoneyAmount { get; set; }

@@ -1,4 +1,4 @@
-﻿using FinanceManagerAPI.Data.Category;
+﻿using FinanceManagerCommon.Data;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Cors.Infrastructure;

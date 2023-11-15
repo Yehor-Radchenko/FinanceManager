@@ -1,7 +1,7 @@
 ﻿@page "/categories"
 
 @using System.Text.Json
-@using FinanceManagerBlazorApp.ViewModels;
+@using FinanceManagerCommon.ViewModels;
 @using Microsoft.AspNetCore.Components.Forms
 @using MudBlazor
 
@@ -12,7 +12,7 @@
 
 <h1 class="mb-4">Categories</h1>
 
-<MudDataGrid T="Category" Items="@_categories" ReadOnly="false" Hover="true" Breakpoint="Breakpoint.Sm"
+<MudDataGrid T="CategoryViewModel" Items="@_categories" ReadOnly="false" Hover="true" Breakpoint="Breakpoint.Sm"
              CommittedItemChanges="@CommittedItemChanges" EditMode="DataGridEditMode.Form"
              LoadingProgressColor="Color.Info" EditTrigger="DataGridEditTrigger.OnRowClick">
 
@@ -82,10 +82,10 @@
  </MudDialog>
 
  @code {
-    List<Category> _categories = new List<Category>();
+    List<CategoryViewModel> _categories = new List<CategoryViewModel>();
     bool _isAddCategoryDialogOpen = false;
     bool _isDeleteConfirmationDialogOpen = false;
-    Category category = new Category();
+    CategoryViewModel category = new CategoryViewModel();
     bool _drawerOpen = false;
 
     protected override async Task OnInitializedAsync() => await LoadData();
@@ -94,7 +94,7 @@
     {
         HttpClient httpClient = ClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri("https://localhost:7016");
-        _categories = await httpClient.GetFromJsonAsync<List<Category>>("/api/category") ?? _categories;
+        _categories = await httpClient.GetFromJsonAsync<List<CategoryViewModel>>("/api/category") ?? _categories;
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -107,14 +107,14 @@
         _drawerOpen = !_drawerOpen;
     }
 
-    async Task CommittedItemChanges(Category item)
+    async Task CommittedItemChanges(CategoryViewModel item)
     {
         HttpClient httpClient = ClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri("https://localhost:7016");
         HttpResponseMessage response = await httpClient.PutAsJsonAsync("/api/category", item);
     }
 
-    string DisplayType(Category item)
+    string DisplayType(CategoryViewModel item)
     {
         switch (item.Type)
         {
@@ -141,7 +141,7 @@
     {
         HttpClient httpClient = ClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri("https://localhost:7016");
-        HttpResponseMessage response = await httpClient.PostAsJsonAsync<Category>("/api/category", category);
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync<CategoryViewModel>("/api/category", category);
         CloseAddCategoryDialog();
         Snackbar.Add("Saved successfully.", Severity.Success);
         await LoadData();
@@ -163,7 +163,7 @@
         CloseDeleteConfirmationDialog();
     }
 
-    private void OpenDeleteConfirmationDialog(Category item)
+    private void OpenDeleteConfirmationDialog(CategoryViewModel item)
     {
         category = item;
         _isDeleteConfirmationDialogOpen = true;

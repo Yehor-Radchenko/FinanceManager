@@ -1,7 +1,12 @@
-﻿namespace FinanceManagerAPI.Data.Operation
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace FinanceManagerCommon.Data
 {
-    public class OperationCreateDto
+    public class OperationUpdateDto
     {
+        [Key]
+        [Required]
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal MoneyAmount { get; set; }

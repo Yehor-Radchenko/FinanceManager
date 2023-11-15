@@ -1,6 +1,6 @@
-﻿using FinanceManagerAPI.Models;
+﻿using FinanceManagerCommon.Enums;
 
-namespace FinanceManagerAPI.Data.Category
+namespace FinanceManagerCommon.Data
 {
     public class CategoryCreateDto
     {

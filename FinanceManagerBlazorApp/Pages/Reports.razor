@@ -1,0 +1,42 @@
+﻿@page "/report"
+
+@using System.Text.Json
+@using FinanceManagerCommon.ViewModels;
+@using Microsoft.AspNetCore.Components.Forms
+@using MudBlazor
+@layout _Layout
+
+@inject IHttpClientFactory ClientFactory
+@inject ISnackbar Snackbar
+
+<h1 class="mb-4">Report</h1><br />
+
+<h2 class="mb-4">Get date report</h2>
+
+<MudForm Model="@report">
+    <MudDatePicker @bind-Date="@selectedDate" Label="Select Date" PickerVariant="PickerVariant.Dialog" />
+    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" OnClick="GetDateReport">Generate</MudButton>
+</MudForm>
+
+<MudDialog @bind-IsVisible="@_isDayReportDialogOpen" DisableSidePadding="true" Options="@dialogWidthOptions">
+
+</MudDialog>
+
+@code {
+    ReportViewModel report = new ReportViewModel();
+    DateTime? selectedDate;
+    DialogOptions dialogWidthOptions = new DialogOptions()
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
+    bool _isDayReportDialogOpen = false;
+
+    private async Task GetDateReport()
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        report = await httpClient.GetFromJsonAsync<ReportViewModel>($"/api/report + {selectedDate.Value.Date.ToString()}");
+    }
+
+}

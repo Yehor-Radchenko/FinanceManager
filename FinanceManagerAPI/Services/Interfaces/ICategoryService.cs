@@ -1,8 +1,7 @@
 ﻿using Azure;
-using FinanceManagerAPI.Data.Category;
-using FinanceManagerAPI.Data.Operation;
+using FinanceManagerCommon.Data;
 using FinanceManagerAPI.Models;
-using FinanceManagerAPI.ViewModels;
+using FinanceManagerCommon.ViewModels;
 
 namespace FinanceManagerAPI.Services.Interfaces
 {

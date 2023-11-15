@@ -1,6 +1,4 @@
-﻿using FinanceManagerAPI.Models;
-
-namespace FinanceManagerAPI.ViewModels
+﻿namespace FinanceManagerCommon.ViewModels
 {
     public class CategoryViewModel
     {

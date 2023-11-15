@@ -1,5 +1,5 @@
-﻿using FinanceManagerAPI.Data;
-using FinanceManagerAPI.ViewModels;
+﻿using FinanceManagerCommon.Data;
+using FinanceManagerCommon.ViewModels;
 
 namespace FinanceManagerAPI.Services.Interfaces
 {

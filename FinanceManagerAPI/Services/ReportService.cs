@@ -1,8 +1,8 @@
-﻿using FinanceManagerAPI.Data;
-using FinanceManagerAPI.Data.Operation;
+﻿using FinanceManagerCommon.Data;
 using FinanceManagerAPI.Models;
+using FinanceManagerCommon.Enums;
 using FinanceManagerAPI.Services.Interfaces;
-using FinanceManagerAPI.ViewModels;
+using FinanceManagerCommon.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
