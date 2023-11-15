@@ -1,0 +1,169 @@
+﻿@page "/categories"
+
+@using System.Text.Json
+@using FinanceManagerCommon.ViewModels
+@using Microsoft.AspNetCore.Components.Forms
+@using MudBlazor
+
+@layout _Layout
+
+@inject IHttpClientFactory ClientFactory
+@inject ISnackbar Snackbar
+
+<h1 class="mb-4">Categories</h1>
+
+<MudDataGrid T="CategoryViewModel" Items="@_categories" ReadOnly="false" Hover="true" Breakpoint="Breakpoint.Sm"
+             CommittedItemChanges="@CommittedItemChanges" EditMode="DataGridEditMode.Form"
+             LoadingProgressColor="Color.Info" EditTrigger="DataGridEditTrigger.OnRowClick">
+
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="Id" IsEditable="false" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Type">
+            <EditTemplate>
+                <MudSelect @bind-Value="context.Item.Type" Required RequiredError="You must select a Type!!!" Margin="@Margin.Dense">
+                     <MudSelectItem Value="1">Income</MudSelectItem>
+                     <MudSelectItem Value="2">Expense</MudSelectItem>
+                 </MudSelect>
+             </EditTemplate>
+             <CellTemplate>
+                 @DisplayType(context.Item)
+             </CellTemplate>
+         </PropertyColumn>
+         <TemplateColumn CellClass="d-flex justify-end">
+             <CellTemplate>
+                 <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Delete" OnClick="@(() => OpenDeleteConfirmationDialog(context.Item))" />
+             </CellTemplate>
+         </TemplateColumn>
+     </Columns>
+ </MudDataGrid>
+
+ <MudButton Style="position: fixed; bottom: 20px; right: 30px;" Color="Color.Primary" Variant="Variant.Filled" @onclick="OpenAddCategoryDialog">Add</MudButton>
+
+ @if (_isAddCategoryDialogOpen)
+{
+    <AddCategoryDialog @bind-IsVisible="_isAddCategoryDialogOpen" OnCategorySaved="HandleCategorySaved"></AddCategoryDialog>
+}
+
+ <MudDialog @bind-IsVisible="@_isDeleteConfirmationDialogOpen">
+     <DialogContent>
+         <div style="text-align: center; padding-bottom: 16px;">
+             <h3>Confirm Deletion</h3>
+             <p>Are you sure you want to delete this category?</p>
+         </div>
+     </DialogContent>
+     <DialogActions>
+         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ConfirmDelete">Yes</MudButton>
+         <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="CancelDelete">No</MudButton>
+     </DialogActions>
+ </MudDialog>
+
+@code {
+    List<CategoryViewModel> _categories = new List<CategoryViewModel>();
+    bool _isAddCategoryDialogOpen = false;
+    bool _isDeleteConfirmationDialogOpen = false;
+    CategoryViewModel category = new CategoryViewModel();
+    bool _drawerOpen = false;
+
+    protected override async Task OnInitializedAsync() => await LoadData();
+
+    async Task LoadData()
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        _categories = await httpClient.GetFromJsonAsync<List<CategoryViewModel>>("/api/category") ?? _categories;
+    }
+
+    void HandleCategorySaved()
+    {
+        CloseAddCategoryDialog();
+        ReloadPage(_navigationManager);
+    }
+
+    public void ReloadPage(this NavigationManager manager)
+    {
+        manager.NavigateTo(manager.Uri, true);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+    }
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    async Task CommittedItemChanges(CategoryViewModel item)
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        HttpResponseMessage response = await httpClient.PutAsJsonAsync("/api/category", item);
+    }
+
+    string DisplayType(CategoryViewModel item)
+    {
+        switch (item.Type)
+        {
+            case 1:
+                return "Income";
+            case 2:
+                return "Expense";
+            default:
+                return "Unknown";
+        }
+    }
+
+    void OpenAddCategoryDialog()
+    {
+        _isAddCategoryDialogOpen = true;
+    }
+
+    void CloseAddCategoryDialog()
+    {
+        _isAddCategoryDialogOpen = false;
+    }
+
+    private async Task SaveCategoryClick()
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync<CategoryViewModel>("/api/category", category);
+        CloseAddCategoryDialog();
+        Snackbar.Add("Saved successfully.", Severity.Success);
+        await LoadData();
+    }
+
+    private async Task ConfirmDelete()
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        HttpResponseMessage response = await httpClient.DeleteAsync("/api/category/" + category.Id);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadData();
+            Snackbar.Add("Deleted successfully.", Severity.Success);
+        }
+        else
+            Snackbar.Add($"Something wents wrong. Response status code: {response.StatusCode}.", Severity.Error);
+        CloseDeleteConfirmationDialog();
+    }
+
+    private void OpenDeleteConfirmationDialog(CategoryViewModel item)
+    {
+        category = item;
+        _isDeleteConfirmationDialogOpen = true;
+    }
+
+    private void CloseDeleteConfirmationDialog()
+    {
+        _isDeleteConfirmationDialogOpen = false;
+    }
+
+    private void CancelDelete()
+    {
+        CloseDeleteConfirmationDialog();
+    }
+}

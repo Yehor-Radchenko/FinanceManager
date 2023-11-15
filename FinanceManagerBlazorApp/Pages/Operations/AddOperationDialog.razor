@@ -1,0 +1,63 @@
+﻿@using System.Text.Json
+@using FinanceManagerCommon.ViewModels;
+@using MudBlazor
+
+@layout _Layout
+
+@inject IHttpClientFactory ClientFactory
+@inject ISnackbar Snackbar
+
+<MudDialog @bind-IsVisible="@_isAddOperationDialogOpen" DisableSidePadding="true" Options="@dialogWidthOptions">
+    <DialogContent>
+        <MudContainer Style="overflow-y: scroll">
+            <div style="text-align: center; padding-bottom: 16px;">
+                <h3>Add new operation</h3>
+            </div>
+            <MudForm Model="@operation">
+                <MudTextField @bind-Value="@operation.Name" Label="Name" Required="true" />
+                <MudTextField @bind-Value="@operation.Description" Label="Description" Required="true" />
+                <MudNumericField @bind-Value="@operation.MoneyAmount" Label="Money amount" Required="true" />
+                <MudDatePicker AutoClose="true" @bind-Date="@date" Editable="true" Label="Date" PickerVariant="PickerVariant.Dialog" />
+                <MudTimePicker @bind-Time="@time" Label="Time" Editable="true" PickerVariant="PickerVariant.Dialog" />
+                <MudSelect @bind-Value="@operation.CategoryId" Label="Type" Required="true">
+                    @foreach (var category in _categories)
+                    {
+                        <MudSelectItem Value="category.Id">@category.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudForm>
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveOperationClick">Save</MudButton>
+        <MudButton Color="Color.Secondary" Variant="Variant.Outlined" OnClick="CloseAddOperationDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    OperationViewModel operation = new OperationViewModel();
+    List<CategoryViewModel> _categories = new List<CategoryViewModel>();
+    bool _isAddOperationDialogOpen = true;
+    DialogOptions dialogWidthOptions = new DialogOptions()
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        };
+    DateTime? date = DateTime.Now;
+    TimeSpan? time = DateTime.Now.TimeOfDay;
+
+    private async Task SaveOperationClick()
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        operation.DateTime = new DateTime(date.Value.Year, date.Value.Month, date.Value.Day, time.Value.Hours, time.Value.Minutes, 0);
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync<OperationViewModel>("/api/operation", operation);
+        CloseAddOperationDialog();
+        Snackbar.Add("Saved successfully.", Severity.Success);
+    }
+
+    void CloseAddOperationDialog()
+    {
+        _isAddOperationDialogOpen = false;
+    }
+}
