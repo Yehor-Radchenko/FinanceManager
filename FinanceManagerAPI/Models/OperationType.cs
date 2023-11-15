@@ -1,4 +1,4 @@
-﻿namespace FinanceManagerCommon.Enums
+﻿namespace FinanceManagerAPI.Models
 {
     public enum OperationType
     {

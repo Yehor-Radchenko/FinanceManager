@@ -1,4 +1,4 @@
-﻿namespace FinanceManagerCommon.ViewModels
+﻿namespace FinanceManagerAPI.ViewModels
 {
     public class OperationViewModel
     {

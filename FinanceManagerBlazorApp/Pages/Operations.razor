@@ -1,7 +1,7 @@
 ﻿@page "/operations"
 
 @using System.Text.Json
-@using FinanceManagerCommon.ViewModels;
+@using FinanceManagerBlazorApp.ViewModels;
 @using MudBlazor
 
 @layout _Layout
@@ -11,7 +11,7 @@
 
 <h1 class="mb-4">Operations</h1>
 
-<MudDataGrid T="OperationViewModel" Items="@_operations" ReadOnly="false" Hover="true" Breakpoint="Breakpoint.Sm"
+<MudDataGrid T="Operation" Items="@_operations" ReadOnly="false"  Hover="true" Breakpoint="Breakpoint.Sm"
              StartedEditingItem="@StartedEditingItem" CommittedItemChanges="@CommittedItemChanges" EditMode="DataGridEditMode.Form"
              LoadingProgressColor="Color.Info" EditTrigger="DataGridEditTrigger.OnRowClick">
 
@@ -89,9 +89,9 @@
 </MudDialog>
 
 @code {
-    List<OperationViewModel> _operations = new List<OperationViewModel>();
-    List<CategoryViewModel> _categories = new List<CategoryViewModel>();
-    OperationViewModel operation = new OperationViewModel();
+    List<Operation> _operations = new List<Operation>();
+    List<Category> _categories = new List<Category>();
+    Operation operation = new Operation();
     bool _isAddOperationDialogOpen = false;
     bool _isDeleteConfirmationDialogOpen = false;
     bool _drawerOpen = false;
@@ -109,8 +109,8 @@
     {
         HttpClient httpClient = ClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri("https://localhost:7016");
-        _operations = await httpClient.GetFromJsonAsync<List<OperationViewModel>>("/api/operation") ?? _operations;
-        _categories = await httpClient.GetFromJsonAsync<List<CategoryViewModel>>("/api/category") ?? _categories;
+        _operations = await httpClient.GetFromJsonAsync<List<Operation>>("/api/operation") ?? _operations;
+        _categories = await httpClient.GetFromJsonAsync<List<Category>>("/api/category") ?? _categories;
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -123,15 +123,15 @@
         _drawerOpen = !_drawerOpen;
     }
 
-    async Task StartedEditingItem(OperationViewModel item)
+    async Task StartedEditingItem(Operation item)
     {
         HttpClient httpClient = ClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri("https://localhost:7016");
         if (_categories.Count == 0)
-            _categories = await httpClient.GetFromJsonAsync<List<CategoryViewModel>>("/api/category") ?? _categories;
+            _categories = await httpClient.GetFromJsonAsync<List<Category>>("/api/category") ?? _categories;
     }
 
-    async Task CommittedItemChanges(OperationViewModel item)
+    async Task CommittedItemChanges(Operation item)
     {
         HttpClient httpClient = ClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri("https://localhost:7016");
@@ -149,7 +149,7 @@
         HttpClient httpClient = ClientFactory.CreateClient();
         httpClient.BaseAddress = new Uri("https://localhost:7016");
         operation.DateTime = new DateTime(date.Value.Year, date.Value.Month, date.Value.Day, time.Value.Hours, time.Value.Minutes, 0);
-        HttpResponseMessage response = await httpClient.PostAsJsonAsync<OperationViewModel>("/api/operation", operation);
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync<Operation>("/api/operation", operation);
         CloseAddOperationDialog();
         Snackbar.Add("Saved successfully.", Severity.Success);
         await LoadData();
@@ -176,7 +176,7 @@
         CloseDeleteConfirmationDialog();
     }
 
-    private void OpenDeleteConfirmationDialog(OperationViewModel item)
+    private void OpenDeleteConfirmationDialog(Operation item)
     {
         operation = item;
         _isDeleteConfirmationDialogOpen = true;

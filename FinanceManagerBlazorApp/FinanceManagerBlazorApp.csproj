@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FinanceManagerAPI\FinanceManagerAPI.csproj" />
-    <ProjectReference Include="..\FinanceManagerCommon\FinanceManagerCommon.csproj" />
   </ItemGroup>
 
 </Project>

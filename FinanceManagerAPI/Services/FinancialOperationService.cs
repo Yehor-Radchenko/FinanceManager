@@ -1,7 +1,7 @@
-﻿using FinanceManagerCommon.Data;
+﻿using FinanceManagerAPI.Data.Operation;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services.Interfaces;
-using FinanceManagerCommon.ViewModels;
+using FinanceManagerAPI.ViewModels;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;

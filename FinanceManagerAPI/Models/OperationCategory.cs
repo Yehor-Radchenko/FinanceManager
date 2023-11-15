@@ -1,5 +1,4 @@
-﻿using FinanceManagerCommon.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FinanceManagerAPI.Models
 {

@@ -1,7 +1,7 @@
-﻿using FinanceManagerCommon.Enums;
+﻿using FinanceManagerAPI.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace FinanceManagerCommon.Data
+namespace FinanceManagerAPI.Data.Category
 {
     public class CategoryUpdateDto
     {

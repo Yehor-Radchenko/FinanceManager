@@ -1,4 +1,6 @@
-﻿namespace FinanceManagerCommon.ViewModels
+﻿using FinanceManagerAPI.Data.Operation;
+
+namespace FinanceManagerAPI.ViewModels
 {
     public class ReportViewModel
     {

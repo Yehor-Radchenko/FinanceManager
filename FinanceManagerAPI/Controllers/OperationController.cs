@@ -1,4 +1,4 @@
-﻿using FinanceManagerCommon.Data;
+﻿using FinanceManagerAPI.Data.Operation;
 using FinanceManagerAPI.Models;
 using FinanceManagerAPI.Services;
 using FinanceManagerAPI.Services.Interfaces;
