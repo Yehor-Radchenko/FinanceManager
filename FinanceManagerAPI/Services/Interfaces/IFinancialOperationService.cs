@@ -1,7 +1,6 @@
-﻿using FinanceManagerAPI.Data;
-using FinanceManagerAPI.Data.Operation;
+﻿using FinanceManagerCommon.Data;
 using FinanceManagerAPI.Models;
-using FinanceManagerAPI.ViewModels;
+using FinanceManagerCommon.ViewModels;
 using System.Text.RegularExpressions;
 
 namespace FinanceManagerAPI.Services.Interfaces

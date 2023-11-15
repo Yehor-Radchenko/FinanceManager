@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
-
+using FinanceManagerCommon.Enums;
 namespace FinanceManagerAPI.Models
 {
     public class FinanceManagerDbContext : DbContext
