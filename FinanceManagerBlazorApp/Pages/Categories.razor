@@ -3,7 +3,6 @@
 @using System.Text.Json
 @using FinanceManagerCommon.ViewModels;
 @using Microsoft.AspNetCore.Components.Forms
-@using MudBlazor
 
 @layout _Layout
 
@@ -86,7 +85,6 @@
     bool _isAddCategoryDialogOpen = false;
     bool _isDeleteConfirmationDialogOpen = false;
     CategoryViewModel category = new CategoryViewModel();
-    bool _drawerOpen = false;
 
     protected override async Task OnInitializedAsync() => await LoadData();
 
@@ -100,11 +98,6 @@
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
-    }
-
-    void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
     }
 
     async Task CommittedItemChanges(CategoryViewModel item)

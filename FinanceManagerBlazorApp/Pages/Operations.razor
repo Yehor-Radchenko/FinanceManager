@@ -94,7 +94,6 @@
     OperationViewModel operation = new OperationViewModel();
     bool _isAddOperationDialogOpen = false;
     bool _isDeleteConfirmationDialogOpen = false;
-    bool _drawerOpen = false;
     DialogOptions dialogWidthOptions = new DialogOptions()
     {
         MaxWidth = MaxWidth.Small,
@@ -116,11 +115,6 @@
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
-    }
-
-    void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
     }
 
     async Task StartedEditingItem(OperationViewModel item)

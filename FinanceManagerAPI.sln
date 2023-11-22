@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceManagerAPI", "Financ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceManagerBlazorApp", "FinanceManagerBlazorApp\FinanceManagerBlazorApp.csproj", "{24B88611-B12F-439A-AA9A-00F4B8A14982}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceManagerCommon", "FinanceManagerCommon\FinanceManagerCommon.csproj", "{80EA9556-2070-4ECE-8C7C-9414DFD9E09F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceManagerCommon", "FinanceManagerCommon\FinanceManagerCommon.csproj", "{80EA9556-2070-4ECE-8C7C-9414DFD9E09F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

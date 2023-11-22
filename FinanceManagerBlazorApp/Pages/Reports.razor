@@ -1,0 +1,24 @@
+﻿@page "/reports"
+
+@using System.Text.Json
+@using FinanceManagerCommon.ViewModels;
+@using Microsoft.AspNetCore.Components.Forms
+
+@layout _Layout
+
+@inject IHttpClientFactory ClientFactory
+@inject ISnackbar Snackbar
+
+<MudContainer Fixed="true">
+    <h1 class="mb-4">Get report for:</h1>
+    <MudRadioGroup @bind-SelectedOption="ReportType">
+        <MudRadio Option="1" Color="Color.Primary" Size="Size.Medium">Day</MudRadio>
+        <MudRadio Option="2" Color="Color.Primary" Size="Size.Medium" Style="margin-left: 15%;">Period</MudRadio>
+    </MudRadioGroup>
+
+</MudContainer>
+
+@code {
+    public int ReportType { get; set; } = 1;
+}
+
