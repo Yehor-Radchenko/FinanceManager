@@ -1,0 +1,115 @@
+﻿@page "/reports"
+
+@using System.Text.Json
+@using FinanceManagerCommon.ViewModels;
+@using Microsoft.AspNetCore.Components.Forms
+
+@layout _Layout
+
+@inject IHttpClientFactory ClientFactory
+@inject ISnackbar Snackbar
+
+<MudContainer Fixed="true">
+    <h1 class="mb-4">Get report for:</h1>
+    <MudRadioGroup @bind-SelectedOption="ReportType">
+        <MudRadio Option="1" Color="Color.Primary" Size="Size.Medium">Day</MudRadio>
+        <MudRadio Option="2" Color="Color.Primary" Size="Size.Medium" Style="margin-left: 15%;">Period</MudRadio>
+    </MudRadioGroup>
+
+    @switch(ReportType)
+    {
+        case 1:
+            <MudCard>
+                <MudCardContent>
+                    <MudForm>
+                        <MudDatePicker AutoClose="true" @bind-Date="@date" Editable="true" Label="Date" RequiredError="Date is required!" PickerVariant="PickerVariant.Dialog" />
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await SubmitDate())" Style="margin-top: 25px;">Get report</MudButton>
+                    </MudForm>
+                </MudCardContent>
+            </MudCard>
+        break;
+
+        case 2:
+            <MudCard>
+                <MudCardContent>
+                    <MudForm>
+                        <MudDateRangePicker AutoClose="true" @bind-DateRange="@dateRange" Editable="true" Label="Date" RequiredError="Date is required!" PickerVariant="PickerVariant.Dialog" />
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await SubmitRange())" Style="margin-top: 25px;">Get report</MudButton>
+                    </MudForm>
+                </MudCardContent>
+            </MudCard>
+        break;
+    }
+
+    @if (reportViewModel != null)
+    {
+        <MudCard Outlined="true" Style="margin-top=25px">
+            <MudCardContent>
+                <MudText>Total Income: @reportViewModel.TotalIncome</MudText>
+                <MudText>Total Expense: @reportViewModel.TotalExpense</MudText><br />
+                <h3>Operations for the Period:</h3>
+                @foreach (var operation in reportViewModel.operationsForPeriod)
+                {
+                    <MudExpansionPanel Text="@operation.Name" Style="font-size: 20px;">
+                        <MudGrid>
+                            <MudItem xs="12" Style="font-size: 16px;">
+                                <MudText>Description: @operation.Description</MudText>
+                            </MudItem>
+                            <MudItem xs="12" Style="font-size: 16px;">
+                                <MudText>Money Amount: @operation.MoneyAmount</MudText>
+                            </MudItem>
+                            <MudItem xs="12" Style="font-size: 16px;">
+                                <MudText>Date: @operation.DateTime.ToShortDateString()</MudText>
+                            </MudItem>
+                            <MudItem xs="12" Style="font-size: 16px;">
+                                <MudText>Time: @operation.DateTime.ToString("HH:mm:ss")</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudExpansionPanel>
+                }
+            </MudCardContent>
+        </MudCard>
+    }
+</MudContainer>
+
+
+@code {
+    public int ReportType { get; set; } = 1;
+    public DateTime? date { get; set; }
+    private DateRange dateRange = new DateRange(DateTime.Now.AddDays(-5).Date, DateTime.Now.Date);
+    ReportViewModel? reportViewModel;
+
+    private async Task SubmitDate()
+    {
+        HttpClient httpClient = ClientFactory.CreateClient();
+        httpClient.BaseAddress = new Uri("https://localhost:7016");
+        reportViewModel = await httpClient.GetFromJsonAsync<ReportViewModel>($"/api/Report/daily-report?date={GetDateOnlyString(date)}");
+
+        if (reportViewModel != null && (reportViewModel.operationsForPeriod == null || reportViewModel.operationsForPeriod.Count == 0))
+            Snackbar.Add("No operations found for the selected period.", Severity.Error);
+    }
+
+    private async Task SubmitRange()
+    {
+        if (dateRange.Start.HasValue && dateRange.End.HasValue)
+        {
+            HttpClient httpClient = ClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri("https://localhost:7016");
+
+            string startDate = GetDateOnlyString(dateRange.Start);
+            string endDate = GetDateOnlyString(dateRange.End);
+
+            reportViewModel = await httpClient.GetFromJsonAsync<ReportViewModel>($"/api/Report/period-report?startDate={startDate}&endDate={endDate}");
+
+            if (reportViewModel != null && (reportViewModel.operationsForPeriod == null || reportViewModel.operationsForPeriod.Count == 0))
+                Snackbar.Add("No operations found for the selected period.", Severity.Error);
+        }
+    }
+
+    public string GetDateOnlyString(DateTime? dateTime)
+    {
+        return dateTime?.ToString("dd.MM.yyyy") ?? string.Empty;
+    }
+
+}
+
